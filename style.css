@@ -1,5 +1,3 @@
-let canSend = true;  // антиспам флаг
-
 function callSound() {
     if (!canSend) {
         alert("Подождите немного, прежде чем отправить следующий вызов.");
@@ -8,7 +6,12 @@ function callSound() {
 
     const vip = document.getElementById("vip").value;
     const reasonField = document.getElementById("reason");
-    const reason = reasonField.value.trim() || "Без причины";
+    const reason = reasonField.value.trim();
+
+    if (reason === "") {
+        alert("Пожалуйста, укажите причину вызова (не только пробелы).");
+        return;  // не отправляем пустое сообщение
+    }
 
     const message = `🔊 Вызов звукача\nVIP: ${vip}\nПричина: ${reason}`;
     sendMessage(message);
@@ -23,7 +26,6 @@ function callSound() {
     reasonField.value = "";
     reasonField.disabled = true;
 
-    // Блокируем повторную отправку на 2 минуты
     canSend = false;
     setTimeout(() => {
         canSend = true;
