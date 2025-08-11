@@ -2,19 +2,7 @@ const BOT_TOKEN = "8497726356:AAFdfJ8tgqSSvBoDjDzAscJHkB7dsIwiCT4";
 const CHAT_ID = "833324843";
 const CARD_NUMBER = "4400430012345678"; // номер карты без пробелов
 
-// Отправка сообщения в Telegram
-function sendMessage(text) {
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: text
-        })
-    });
-}
-
-let canSend = true; // Флаг антиспама
+let canSend = true;
 
 function callSound() {
     if (!canSend) {
@@ -40,23 +28,13 @@ function callSound() {
 
     alert("Звукач вызван!");
 
-    // Очистка и блокировка поля ввода
     reasonField.value = "";
     reasonField.disabled = true;
 
-    // Блокировка кнопки вызова
-    const callBtn = document.querySelector(".call-btn");
-    callBtn.disabled = true;
-    callBtn.style.opacity = 0.6;
-
     canSend = false;
-
-    // Снятие блокировки через 2 минуты
     setTimeout(() => {
         canSend = true;
         reasonField.disabled = false;
-        callBtn.disabled = false;
-        callBtn.style.opacity = 1;
     }, 2 * 60 * 1000);
 }
 
@@ -75,4 +53,15 @@ function copyCard() {
 
 function closeModal() {
     document.getElementById("cardModal").style.display = "none";
+}
+
+function sendMessage(text) {
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: text
+        })
+    });
 }
