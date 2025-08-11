@@ -2,6 +2,8 @@ const BOT_TOKEN = "8497726356:AAFdfJ8tgqSSvBoDjDzAscJHkB7dsIwiCT4";
 const CHAT_ID = "833324843";
 const CARD_NUMBER = "4400430012345678"; // номер карты без пробелов
 
+let timerInterval;
+
 function sendMessage(text) {
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
@@ -17,8 +19,9 @@ function callSound() {
     const lastCall = localStorage.getItem('lastCallTime');
     const now = Date.now();
 
-    if (lastCall && now - lastCall < 60 * 1000) { // 1 минута = 60000 мс
-        alert("Подождите минуту перед следующим вызовом.");
+    if (lastCall && now - lastCall < 60 * 1000) {
+        const waitTime = 60 - Math.floor((now - lastCall) / 1000);
+        showTimerMessage(waitTime);
         return;
     }
 
@@ -36,10 +39,8 @@ function callSound() {
 
     alert("Звукач вызван!");
 
-    // Сохраняем время последнего вызова в localStorage
     localStorage.setItem('lastCallTime', now);
 
-    // Блокируем поле ввода и кнопку
     reasonField.value = "";
     reasonField.disabled = true;
 
@@ -47,12 +48,37 @@ function callSound() {
     callBtn.disabled = true;
     callBtn.style.opacity = 0.6;
 
-    // Разблокируем через 1 минуту
+    showTimerMessage(60);
+
     setTimeout(() => {
         reasonField.disabled = false;
         callBtn.disabled = false;
         callBtn.style.opacity = 1;
+        hideTimerMessage();
     }, 60 * 1000);
+}
+
+function showTimerMessage(seconds) {
+    clearInterval(timerInterval);
+    const timerMessage = document.getElementById("timerMessage");
+    const countdown = document.getElementById("countdown");
+    countdown.textContent = seconds;
+    timerMessage.style.display = "block";
+
+    timerInterval = setInterval(() => {
+        seconds--;
+        if (seconds <= 0) {
+            hideTimerMessage();
+            clearInterval(timerInterval);
+        } else {
+            countdown.textContent = seconds;
+        }
+    }, 1000);
+}
+
+function hideTimerMessage() {
+    const timerMessage = document.getElementById("timerMessage");
+    timerMessage.style.display = "none";
 }
 
 function leaveTip() {
