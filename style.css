@@ -1,34 +1,126 @@
-function callSound() {
-    if (!canSend) {
-        alert("Подождите немного, прежде чем отправить следующий вызов.");
-        return;
-    }
+body {
+    background: linear-gradient(135deg, #1a1a1a, #2b2b2b);
+    background-size: cover;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
 
-    const vip = document.getElementById("vip").value;
-    const reasonField = document.getElementById("reason");
-    const reason = reasonField.value.trim();
 
-    if (reason === "") {
-        alert("Пожалуйста, укажите причину вызова (не только пробелы).");
-        return;  // не отправляем пустое сообщение
-    }
+.container {
+    padding: 20px;
+}
 
-    const message = `🔊 Вызов звукача\nVIP: ${vip}\nПричина: ${reason}`;
-    sendMessage(message);
+.photo img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid gold;
+    animation: fadeIn 1s ease-in-out;
+}
 
-    const icon = document.querySelector(".call-btn .icon");
-    icon.style.animation = "pulse 0.4s infinite";
-    setTimeout(() => icon.style.animation = "pulse 1.2s infinite", 2000);
+h1 {
+    text-shadow: 0 0 10px gold;
+}
 
-    alert("Звукач вызван!");
+select, textarea, button {
+    width: 90%;
+    max-width: 350px;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    display: block;
+}
 
-    // Очищаем и блокируем поле сообщения
-    reasonField.value = "";
-    reasonField.disabled = true;
+textarea {
+    height: 80px;
+    resize: none;
+}
 
-    canSend = false;
-    setTimeout(() => {
-        canSend = true;
-        reasonField.disabled = false;
-    }, 2 * 60 * 1000);
+/* Кнопка вызова */
+.call-btn {
+    background: gold;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+
+.call-btn .icon {
+    display: inline-block;
+    animation: pulse 1.2s infinite;
+}
+
+/* Кнопка чаевых */
+.tip-btn {
+    background: linear-gradient(45deg, gold, orange);
+    color: black;
+    font-weight: bold;
+    box-shadow: 0 0 15px gold;
+    transition: box-shadow 0.3s ease;
+}
+
+.tip-btn:hover {
+    box-shadow: 0 0 25px gold;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #222;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 300px;
+    border: 2px solid gold;
+    animation: fadeIn 0.5s ease;
+}
+
+#cardNumber {
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px 0;
+    background: #333;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid gold;
+}
+
+#cardNumber:hover {
+    background: gold;
+    color: black;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
