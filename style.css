@@ -1,32 +1,42 @@
-/* Основные стили страницы */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color: white;
-    background-color: #1a1a1a; /* Запасной фон, если GIF не загрузится */
-    position: relative;
-    overflow-x: hidden;
-}
-
-/* Фоновый GIF с падающими листьями */
+/* Фон с листопадом */
 #gif-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: url('leslopad.gif') no-repeat center center;
-    background-size: cover;
-    z-index: -1; /* Фон под всем контентом */
-    pointer-events: none; /* Чтобы не мешал кликам */
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: url('leslopad.gif') no-repeat center center;
+  background-size: cover;
+  z-index: -1;
+  pointer-events: none;
+  filter: brightness(0.7); /* затемнение фона для контраста */
 }
 
-/* Контейнер с основным содержимым */
+/* Контейнер с содержимым */
 .container {
-    position: relative; /* Чтобы быть выше фонового GIF */
-    padding: 20px;
-    text-align: center;
+  position: relative;
+  max-width: 500px; /* ограничиваем ширину, чтоб не растягивался */
+  margin: 40px auto; /* центрируем и добавляем отступ сверху и снизу */
+  padding: 20px;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.3); /* лёгкий затемнённый фон для читаемости */
+  border-radius: 15px;
 }
 
-/* Остальные твои стили, например для кнопок, текста и т.п. */
+/* Фото — адаптивное и поменьше */
+.photo img {
+  width: 100%;      /* займет всю ширину контейнера */
+  max-width: 300px; /* максимум 300px */
+  height: auto;     /* сохраняет пропорции */
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid gold;
+  box-shadow: 0 0 20px gold;
+  margin-bottom: 20px;
+}
+
+/* Заголовок */
+h1 {
+  font-size: 2rem;
+  text-shadow: 0 0 10px gold;
+  margin: 0 0 20px;
+}
