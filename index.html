@@ -1,54 +1,84 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Звукач</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VIP Звукач</title>
+  <style>
+    /* Основные стили страницы */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Контейнер с основным контентом */
+    .container {
+      max-width: 500px;
+      width: 90vw;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+    }
+
+    /* Фото - адаптивное и не слишком большое */
+    .photo img {
+      width: 300px;
+      height: 300px;
+      max-width: 90vw;
+      max-height: 90vw;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid gold;
+      box-shadow: 0 0 20px gold;
+      margin-bottom: 20px;
+    }
+
+    /* Заголовок */
+    h1 {
+      font-size: 2rem;
+      text-shadow: 0 0 10px gold;
+      margin: 0 0 20px;
+    }
+
+    /* Таймер сообщения */
+    #timerMessage {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      color: gold;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 0 15px gold;
+      z-index: 1000;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="photo">
-            <img src="kukandrio.jpg" alt="Звукач">
-        </div>
-        <h1>Звукач: Куаныш</h1>
-
-        <label>Выберите номер випки:</label>
-        <select id="vip">
-            <option value="VIP 1">VIP 1</option>
-            <option value="VIP 2">VIP 2</option>
-            <option value="VIP 3">VIP 3</option>
-            <option value="VIP 5">VIP 5</option>
-            <option value="VIP 6">VIP 6</option>
-            <option value="VIP 7">VIP 7</option>
-            <option value="VIP 8">VIP 8</option>
-            <option value="VIP 9">VIP 9</option>
-            <option value="Малый зал">Малый зал</option>
-        </select>
-
-        <label>Причина вызова:</label>
-        <textarea id="reason" placeholder="Например: Микрофоны перестали работать..."></textarea>
-
-        <button class="call-btn" onclick="callSound()">
-            <span class="icon">🔊</span> Вызвать звукача
-        </button>
-        <button class="tip-btn" onclick="leaveTip()">💰 Оставить чаевые</button>
+  <div class="container">
+    <div class="photo">
+      <img src="kukandrio.jpg" alt="Звукач" />
     </div>
+    <h1>Звукач: Куаныш</h1>
+    <!-- Тут остальной контент, например формы и кнопки -->
+  </div>
 
-    <!-- Модальное окно -->
-    <div id="cardModal" class="modal">
-        <div class="modal-content">
-            <h3>💳 Мой номер карты</h3>
-            <p id="cardNumber" onclick="copyCard()">4400 4300 1234 5678</p>
-            <small>Нажмите, чтобы скопировать</small>
-            <button onclick="closeModal()">Закрыть</button>
-        </div>
-    </div>
+  <div id="timerMessage">
+    Вы уже отправили сообщение. Подождите <span id="countdown">60</span> секунд.
+  </div>
 
-   
-</div>
-
+  <script src="script.js"></script>
 </body>
 </html>
-
-
