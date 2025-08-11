@@ -2,11 +2,22 @@ const BOT_TOKEN = "8497726356:AAFdfJ8tgqSSvBoDjDzAscJHkB7dsIwiCT4";
 const CHAT_ID = "833324843";
 const CARD_NUMBER = "4400430012345678"; // номер карты без пробелов
 
-// Флаг для задержки отправки
-let canSend = true;
+function sendMessage(text) {
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: text
+        })
+    });
+}
 
 function callSound() {
-    if (!canSend) {
+    const lastCall = localStorage.getItem('lastCallTime');
+    const now = Date.now();
+
+    if (lastCall && now - lastCall < 60 * 1000) { // 1 минута = 60000 мс
         alert("Подождите минуту перед следующим вызовом.");
         return;
     }
@@ -23,21 +34,25 @@ function callSound() {
     const message = `🔊 Вызов звукача\nVIP: ${vip}\nПричина: ${reason}`;
     sendMessage(message);
 
-    const icon = document.querySelector(".call-btn .icon");
-    icon.style.animation = "pulse 0.4s infinite";
-    setTimeout(() => icon.style.animation = "pulse 1.2s infinite", 2000);
-
     alert("Звукач вызван!");
 
-    // Очистка и блокировка поля ввода
+    // Сохраняем время последнего вызова в localStorage
+    localStorage.setItem('lastCallTime', now);
+
+    // Блокируем поле ввода и кнопку
     reasonField.value = "";
     reasonField.disabled = true;
 
-    canSend = false;
+    const callBtn = document.querySelector(".call-btn");
+    callBtn.disabled = true;
+    callBtn.style.opacity = 0.6;
+
+    // Разблокируем через 1 минуту
     setTimeout(() => {
-        canSend = true;
         reasonField.disabled = false;
-    }, 60 * 1000); // 1 минута задержки
+        callBtn.disabled = false;
+        callBtn.style.opacity = 1;
+    }, 60 * 1000);
 }
 
 function leaveTip() {
@@ -55,15 +70,4 @@ function copyCard() {
 
 function closeModal() {
     document.getElementById("cardModal").style.display = "none";
-}
-
-function sendMessage(text) {
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: text
-        })
-    });
 }
