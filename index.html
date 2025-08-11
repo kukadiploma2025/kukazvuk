@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Звукач</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="photo">
+            <img src="kukandrio.jpg" alt="Звукач">
+        </div>
+        <h1>Звукач: Куаныш</h1>
+
+        <label>Выберите номер випки:</label>
+        <select id="vip">
+            <option value="VIP 1">VIP 1</option>
+            <option value="VIP 2">VIP 2</option>
+            <option value="VIP 3">VIP 3</option>
+            <option value="VIP 5">VIP 5</option>
+            <option value="VIP 6">VIP 6</option>
+            <option value="VIP 7">VIP 7</option>
+            <option value="VIP 8">VIP 8</option>
+            <option value="VIP 9">VIP 9</option>
+            <option value="Малый зал">Малый зал</option>
+        </select>
+
+        <label>Причина вызова:</label>
+        <textarea id="reason" placeholder="Например: Микрофоны перестали работать..."></textarea>
+
+        <button class="call-btn" onclick="callSound()">
+            <span class="icon">🔊</span> Вызвать звукача
+        </button>
+        <button class="tip-btn" onclick="leaveTip()">💰 Оставить чаевые</button>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <h3>💳 Мой номер карты</h3>
+            <p id="cardNumber" onclick="copyCard()">4400 4300 1234 5678</p>
+            <small>Нажмите, чтобы скопировать</small>
+            <button onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
