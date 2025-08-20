@@ -1,6 +1,6 @@
 const BOT_TOKEN = "8497726356:AAFdfJ8tgqSSvBoDjDzAscJHkB7dsIwiCT4";
 const CHAT_ID = "833324843";
-const CARD_NUMBER = "4400430222701341"; // номер карты без пробелов
+const CARD_NUMBER = "4400430386921370"; // номер карты без пробелов
 
 let timerInterval;
 
@@ -97,4 +97,5 @@ function copyCard() {
 function closeModal() {
     document.getElementById("cardModal").style.display = "none";
 }
+
 
