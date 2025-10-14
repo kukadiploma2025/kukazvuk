@@ -205,9 +205,40 @@ createTable(group2, "table2");
 
 document.getElementById("date").textContent = new Date().toLocaleDateString("ru-RU");
 
-// Функция для скачивания DOCX (можно потом настроить)
-function downloadDoc() {
-    alert("Функция сохранения DOCX пока не реализована");
+// === Функция сохранения DOCX ===
+async function downloadDoc() {
+    const { Document, Packer, Paragraph } = docx;
+
+    const rows = [];
+
+    [group1, group2].forEach((group, gIndex) => {
+        rows.push(new Paragraph({ text: `Подгруппа ${gIndex + 1}`, spacing: { after: 200 } }));
+
+        group.forEach((name, index) => {
+            const tableRow = document.querySelectorAll(`#table${gIndex + 1} tr`)[index];
+            const checkbox = tableRow.querySelector("input");
+            const status = checkbox.checked ? "Присутствует" : "Отсутствует";
+
+            rows.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
+        });
+    });
+
+    const doc = new Document({
+        sections: [{
+            properties: {},
+            children: [
+                new Paragraph({ text: "Учёт посещаемости", heading: "Heading1" }),
+                new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } }),
+                ...rows
+            ],
+        }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "посещаемость.docx";
+    link.click();
 }
 </script>
 
