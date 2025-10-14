@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Учёт посещаемости</title>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .login-box {
+        background: #151515;
+        border: 1px solid #2b2b2b;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 0 25px rgba(0,255,198,0.1);
+    }
+    input {
+        margin: 10px 0;
+        padding: 12px;
+        width: 220px;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+        background: #1f1f1f;
+        color: #fff;
+        text-align: center;
+    }
+    input:focus {
+        box-shadow: 0 0 10px #00ffc6;
+    }
+    button {
+        margin-top: 15px;
+        background: #00ffc6;
+        color: #000;
+        font-weight: bold;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 0 15px #00ffc6;
+    }
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px #00ffc6;
+    }
+    #error {
+        color: #ff4f6d;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    /* Основная часть */
+    .hidden { display: none; }
+    .group-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 25px;
+        margin: 20px;
+    }
+    .group {
+        background: #181818;
+        border: 1px solid #2b2b2b;
+        border-radius: 12px;
+        padding: 20px;
+        width: 360px;
+        box-shadow: 0 0 20px rgba(0,255,198,0.1);
+    }
+    h1 {
+        color: #00ffc6;
+        text-shadow: 0 0 10px #00ffc6;
+        margin-top: 20px;
+    }
+    h2 {
+        color: #00ffc6;
+        font-size: 20px;
+        border-bottom: 1px solid #00ffc6;
+        padding-bottom: 6px;
+        margin-bottom: 10px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #ddd;
+    }
+    td {
+        padding: 6px;
+        border-bottom: 1px solid #2a2a2a;
+        text-align: left;
+    }
+    input[type="checkbox"] {
+        transform: scale(1.2);
+        accent-color: #00ffc6;
+        cursor: pointer;
+    }
+    tr.present { background: rgba(0, 255, 198, 0.15); }
+    tr.absent { background: rgba(255, 0, 70, 0.15); }
+</style>
+</head>
+<body>
+
+<!-- 🔐 Экран входа -->
+<div class="login-container" id="loginPage">
+    <div class="login-box">
+        <h1>Вход в систему</h1>
+        <input id="username" placeholder="Логин">
+        <input id="password" type="password" placeholder="Пароль">
+        <button onclick="login()">Войти</button>
+        <div id="error"></div>
+    </div>
+</div>
+
+<!-- 📋 Главная страница -->
+<div class="hidden" id="mainPage">
+    <h1>Учёт посещаемости</h1>
+    <p>ОП 6B06102 – «Вычислительная техника и программное обеспечение»<br>
+    Группа Б ВТиПО-25/23 Р | Дата: <span id="date"></span></p>
+
+    <div class="group-container">
+        <div class="group">
+            <h2>1 группа</h2>
+            <table id="table1"></table>
+        </div>
+        <div class="group">
+            <h2>2 группа</h2>
+            <table id="table2"></table>
+        </div>
+    </div>
+    <button onclick="downloadDoc()">💾 Сохранить в DOCX</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@8.0.0/build/index.umd.js"></script>
+<script>
+const users = {
+    "Kukandrio": "7890",
+    "Asanali": "1423",
+    "ZamSt": "2233"
+};
+
+function login() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const error = document.getElementById("error");
+
+    if (users[user] && users[user] === pass) {
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("mainPage").classList.remove("hidden");
+    } else {
+        error.textContent = "Неверный логин или пароль ❌";
+    }
+}
+
+// === Список студентов ===
+const students = [/* ← сюда можно вставить всех 47 студентов из прошлой версии */];
+
+function createTable(group, id) {
+    const table = document.getElementById(id);
+    group.forEach((name, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${index + 1}</td><td>${name}</td>
+                         <td><input type="checkbox"></td>`;
+        table.appendChild(row);
+        const box = row.querySelector("input");
+        box.addEventListener("change", () => {
+            row.className = box.checked ? "present" : "absent";
+        });
+    });
+}
+
+const group1 = students.slice(0, 24);
+const group2 = students.slice(24, 47);
+createTable(group1, "table1");
+createTable(group2, "table2");
+document.getElementById("date").textContent = new Date().toLocaleDateString("ru-RU");
+</script>
+
+</body>
+</html>
