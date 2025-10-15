@@ -38,9 +38,7 @@
         color: #fff;
         text-align: center;
     }
-    input:focus {
-        box-shadow: 0 0 10px #00ffc6;
-    }
+    input:focus { box-shadow: 0 0 10px #00ffc6; }
     button {
         margin-top: 15px;
         background: #00ffc6;
@@ -57,11 +55,7 @@
         transform: scale(1.05);
         box-shadow: 0 0 25px #00ffc6;
     }
-    #error {
-        color: #ff4f6d;
-        margin-top: 10px;
-        font-size: 14px;
-    }
+    #error { color: #ff4f6d; margin-top: 10px; font-size: 14px; }
     .hidden { display: none; }
     .group-container {
         display: flex;
@@ -111,7 +105,7 @@
 </head>
 <body>
 
-<!-- 🔐 Экран входа -->
+<!-- 🔐 Вход -->
 <div class="login-container" id="loginPage">
     <div class="login-box">
         <h1>Вход в систему</h1>
@@ -122,7 +116,7 @@
     </div>
 </div>
 
-<!-- 📋 Главная страница -->
+<!-- 📋 Главная -->
 <div class="hidden" id="mainPage">
     <h1>Учёт посещаемости</h1>
     <p>ОП 6B06102 – «Вычислительная техника и программное обеспечение»<br>
@@ -142,6 +136,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/docx@8.0.0/build/index.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
 <script>
 const users = {
     "Kukandrio": "7890",
@@ -153,7 +149,6 @@ function login() {
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value.trim();
     const error = document.getElementById("error");
-
     if (users[user] && users[user] === pass) {
         document.getElementById("loginPage").classList.add("hidden");
         document.getElementById("mainPage").classList.remove("hidden");
@@ -162,7 +157,6 @@ function login() {
     }
 }
 
-// === Студенты по подгруппам ===
 const group1 = [
     "Абенов Расулхан Елеубаевич","Абильгазиев Тагир Балтабаевич","Аканов Биржан Бейбитович",
     "Асан Бексултан Альбекулы","Асанханов Қасымжомарт Ержанұлы","Барабан Максим Андреевич",
@@ -199,48 +193,33 @@ function createTable(group, id) {
         });
     });
 }
-
 createTable(group1, "table1");
 createTable(group2, "table2");
 
 document.getElementById("date").textContent = new Date().toLocaleDateString("ru-RU");
 
-// === Функция сохранения DOCX ===
 async function downloadDoc() {
     const { Document, Packer, Paragraph } = docx;
 
-    const rows = [];
+    const children = [new Paragraph({ text: "Учёт посещаемости", heading: "Heading1" })];
+    children.push(new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } }));
 
-    [group1, group2].forEach((group, gIndex) => {
-        rows.push(new Paragraph({ text: `Подгруппа ${gIndex + 1}`, spacing: { after: 200 } }));
-
+    [group1, group2].forEach((group, i) => {
+        children.push(new Paragraph({ text: `Подгруппа ${i + 1}`, spacing: { after: 200 } }));
         group.forEach((name, index) => {
-            const tableRow = document.querySelectorAll(`#table${gIndex + 1} tr`)[index];
-            const checkbox = tableRow.querySelector("input");
-            const status = checkbox.checked ? "Присутствует" : "Отсутствует";
-
-            rows.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
+            const tr = document.querySelectorAll(`#table${i + 1} tr`)[index];
+            const checked = tr.querySelector("input").checked;
+            const status = checked ? "✅ Присутствует" : "❌ Отсутствует";
+            children.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
         });
+        children.push(new Paragraph({ text: "" }));
     });
 
-    const doc = new Document({
-        sections: [{
-            properties: {},
-            children: [
-                new Paragraph({ text: "Учёт посещаемости", heading: "Heading1" }),
-                new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } }),
-                ...rows
-            ],
-        }],
-    });
-
+    const doc = new Document({ sections: [{ children }] });
     const blob = await Packer.toBlob(doc);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "посещаемость.docx";
-    link.click();
+
+    saveAs(blob, `Посещаемость_${new Date().toLocaleDateString("ru-RU")}.docx`);
 }
 </script>
-
 </body>
 </html>
