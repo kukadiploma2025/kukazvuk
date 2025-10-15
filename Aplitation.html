@@ -1,225 +1,207 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Учёт посещаемости</title>
-<style>
+  <meta charset="UTF-8">
+  <title>Учёт посещаемости — Б ВТиПО-25/23 Р</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.0/docx.umd.min.js"></script>
+  <style>
     body {
-        font-family: "Segoe UI", sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        text-align: center;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
     }
-    .login-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .login-box {
-        background: #151515;
-        border: 1px solid #2b2b2b;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 0 25px rgba(0,255,198,0.1);
+    .login, .content {
+      max-width: 800px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     input {
-        margin: 10px 0;
-        padding: 12px;
-        width: 220px;
-        border: none;
-        border-radius: 8px;
-        outline: none;
-        background: #1f1f1f;
-        color: #fff;
-        text-align: center;
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
     }
-    input:focus { box-shadow: 0 0 10px #00ffc6; }
     button {
-        margin-top: 15px;
-        background: #00ffc6;
-        color: #000;
-        font-weight: bold;
-        padding: 12px 25px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.3s;
-        box-shadow: 0 0 15px #00ffc6;
+      margin: 10px 0;
+      padding: 10px 15px;
+      background: #0078d7;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
     button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 25px #00ffc6;
-    }
-    #error { color: #ff4f6d; margin-top: 10px; font-size: 14px; }
-    .hidden { display: none; }
-    .group-container {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 25px;
-        margin: 20px;
-    }
-    .group {
-        background: #181818;
-        border: 1px solid #2b2b2b;
-        border-radius: 12px;
-        padding: 20px;
-        width: 360px;
-        box-shadow: 0 0 20px rgba(0,255,198,0.1);
-    }
-    h1 {
-        color: #00ffc6;
-        text-shadow: 0 0 10px #00ffc6;
-        margin-top: 20px;
-    }
-    h2 {
-        color: #00ffc6;
-        font-size: 20px;
-        border-bottom: 1px solid #00ffc6;
-        padding-bottom: 6px;
-        margin-bottom: 10px;
+      background: #005bb5;
     }
     table {
-        width: 100%;
-        border-collapse: collapse;
-        color: #ddd;
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
     }
-    td {
-        padding: 6px;
-        border-bottom: 1px solid #2a2a2a;
-        text-align: left;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
     }
-    input[type="checkbox"] {
-        transform: scale(1.2);
-        accent-color: #00ffc6;
-        cursor: pointer;
+    th {
+      background: #f0f0f0;
     }
-    tr.present { background: rgba(0, 255, 198, 0.15); }
-    tr.absent { background: rgba(255, 0, 70, 0.15); }
-</style>
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+    }
+  </style>
 </head>
 <body>
+  <div class="login" id="login">
+    <h2>Вход в систему</h2>
+    <input id="loginInput" placeholder="Логин" />
+    <input id="passwordInput" placeholder="Пароль" type="password" />
+    <button onclick="checkLogin()">Войти</button>
+  </div>
 
-<!-- 🔐 Вход -->
-<div class="login-container" id="loginPage">
-    <div class="login-box">
-        <h1>Вход в систему</h1>
-        <input id="username" placeholder="Логин">
-        <input id="password" type="password" placeholder="Пароль">
-        <button onclick="login()">Войти</button>
-        <div id="error"></div>
-    </div>
-</div>
+  <div class="content" id="content" style="display:none;">
+    <h2>Учёт посещаемости — Б ВТиПО-25/23 Р</h2>
+    <div id="tables"></div>
+    <button onclick="downloadDoc()">Сохранить в Word</button>
+  </div>
 
-<!-- 📋 Главная -->
-<div class="hidden" id="mainPage">
-    <h1>Учёт посещаемости</h1>
-    <p>ОП 6B06102 – «Вычислительная техника и программное обеспечение»<br>
-    Группа Б ВТиПО-25/23 Р | Дата: <span id="date"></span></p>
+  <script>
+    // --- ДАННЫЕ ДЛЯ ВХОДА ---
+    const users = [
+      { login: "Kukandrio", password: "7890" },
+      { login: "Asanali", password: "1423" },
+      { login: "ZamSt", password: "2233" }
+    ];
 
-    <div class="group-container">
-        <div class="group">
-            <h2>1 подгруппа</h2>
-            <table id="table1"></table>
-        </div>
-        <div class="group">
-            <h2>2 подгруппа</h2>
-            <table id="table2"></table>
-        </div>
-    </div>
-    <button onclick="downloadDoc()">💾 Сохранить в DOCX</button>
-</div>
+    // --- СПИСОК СТУДЕНТОВ ---
+    const students = [
+      "Абенов Расулхан Елеубаевич",
+      "Абильгазиев Тагир Балтабаевич",
+      "Аканов Биржан Бейбитович",
+      "Асан Бексултан Альбекулы",
+      "Асанханов Қасымжомарт Ержанұлы",
+      "Барабан Максим Андреевич",
+      "Бодыков Алдияр Ербуланович",
+      "Буряков Матвей Евгениевич",
+      "Бекен Мағжан Еділұлы",
+      "Гадамуров Бекхан Рустамович",
+      "Галимуллин Камиль Раульевич",
+      "Ерден Асанали Ержанұлы",
+      "Жакиянов Амир Маратович",
+      "Жанторин Саян Серикович",
+      "Жумадилов Ильяс Сакенулы",
+      "Зайкен Әділет Нурланұлы",
+      "Игнатенко Артем Алексеевич",
+      "Каиыпов Нурсултан Марсович",
+      "Караосманов Ислам Хусейнович",
+      "Кизаев Алан Максатович",
+      "Ковалев Сергей Владиславович",
+      "Козяков Владислав Дмитриевич",
+      "Кудайбергенов Темирлан Муратович",
+      "Кузьменко Вадим Георгиевич",
+      "Қабдрашит Нұрасыл Мұратұлы",
+      "Қаирбай Әмір Мақсұтұлы",
+      "Қалманбай Алихан Абилдаұлы",
+      "Қуантай Ерлан Ерқанатұлы",
+      "Латифов Ислам Ихтиярович",
+      "Моисеев Вячеслав Евгеньевич",
+      "Муратов Мақсат Маратович",
+      "Мухтаров Алибек Азаматович",
+      "Орунбасар Ерасыл Хамитұлы",
+      "Петрусь Наиль Ескендерович",
+      "Прокофьев Давид Витальевич",
+      "Сагитов Султан Сагатович",
+      "Салкен Диас Мадиұлы",
+      "Сапинов Әділ Нұрмахаматұлы",
+      "Серік Баққали Бейсенбекұлы",
+      "Серикова Анеля Канатовна",
+      "Синельников Артур Николаевич",
+      "Сычёв Сергей Витальевич",
+      "Темирбаев Абылайхан Адильевич",
+      "Тилеуқабыл Алихан Ерболатұлы",
+      "Тлепберген Қуаныш Мұхитұлы",
+      "Хачатрян Артур Гайкович",
+      "Рахметов Мұхаммед Умбетқұлұлы",
+      "Айкеев Тлеухан Тулегенович",
+      "Шаканов Абильмансур Алпамысович",
+      "Шунков Эмир Максатович"
+    ];
 
-<script src="https://cdn.jsdelivr.net/npm/docx@8.0.0/build/index.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    // --- ДЕЛИМ НА 2 ГРУППЫ ---
+    const half = Math.ceil(students.length / 2);
+    const group1 = students.slice(0, half);
+    const group2 = students.slice(half);
 
-<script>
-const users = {
-    "Kukandrio": "7890",
-    "Asanali": "1423",
-    "ZamSt": "2233"
-};
-
-function login() {
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
-    const error = document.getElementById("error");
-    if (users[user] && users[user] === pass) {
-        document.getElementById("loginPage").classList.add("hidden");
-        document.getElementById("mainPage").classList.remove("hidden");
-    } else {
-        error.textContent = "Неверный логин или пароль ❌";
+    function checkLogin() {
+      const login = document.getElementById("loginInput").value;
+      const pass = document.getElementById("passwordInput").value;
+      const ok = users.some(u => u.login === login && u.password === pass);
+      if (ok) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        renderTables();
+      } else {
+        alert("Неверный логин или пароль!");
+      }
     }
-}
 
-const group1 = [
-    "Абенов Расулхан Елеубаевич","Абильгазиев Тагир Балтабаевич","Аканов Биржан Бейбитович",
-    "Асан Бексултан Альбекулы","Асанханов Қасымжомарт Ержанұлы","Барабан Максим Андреевич",
-    "Бодыков Алдияр Ербуланович","Буряков Матвей Евгениевич","Бекен Мағжан Еділұлы",
-    "Гадамуров Бекхан Рустамович","Галимуллин Камиль Раульевич","Ерден Асанали Ержанұлы",
-    "Жакиянов Амир Маратович","Жанторин Саян Серикович","Жумадилов Ильяс Сакенулы",
-    "Зайкен Әділет Нурланұлы","Игнатенко Артем Алексеевич","Каиыпов Нурсултан Марсович",
-    "Караосманов Ислам Хусейнович","Кизаев Алан Максатович","Ковалев Сергей Владиславович",
-    "Козяков Владислав Дмитриевич","Кудайбергенов Темирлан Муратович","Кузьменко Вадим Георгиевич"
-];
-
-const group2 = [
-    "Қабдрашит Нұрасыл Мұратұлы","Қаирбай Әмір Мақсұтұлы","Қалманбай Алихан Абилдаұлы",
-    "Қуантай Ерлан Ерқанатұлы","Латифов Ислам Ихтиярович","Моисеев Вячеслав Евгеньевич",
-    "Муратов Мақсат Маратович","Мухтаров Алибек Азаматович","Орунбасар Ерасыл Хамитұлы",
-    "Петрусь Наиль Ескендерович","Прокофьев Давид Витальевич","Сагитов Султан Сагатович",
-    "Салкен Диас Мадиұлы","Сапинов Әділ Нұрмахаматұлы","Серік Баққали Бейсенбекұлы",
-    "Серикова Анеля Канатовна","Синельников Артур Николаевич","Сычёв Сергей Витальевич",
-    "Темирбаев Абылайхан Адильевич","Тилеуқабыл Алихан Ерболатұлы","Тлепберген Қуаныш Мұхитұлы",
-    "Хачатрян Артур Гайкович","Рахметов Мұхаммед Умбетқұлұлы","Айкеев Тлеухан Тулегенович",
-    "Шаканов Абильмансур Алпамысович","Шунков Эмир Максатович"
-];
-
-function createTable(group, id) {
-    const table = document.getElementById(id);
-    group.forEach((name, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${index + 1}</td><td>${name}</td>
-                         <td><input type="checkbox"></td>`;
-        table.appendChild(row);
-        const box = row.querySelector("input");
-        box.addEventListener("change", () => {
-            row.className = box.checked ? "present" : "absent";
+    function renderTables() {
+      const container = document.getElementById("tables");
+      container.innerHTML = "";
+      [group1, group2].forEach((group, index) => {
+        const table = document.createElement("table");
+        table.innerHTML = `<tr><th>№</th><th>ФИО студента</th><th>Присутствие</th></tr>`;
+        group.forEach((name, i) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${name}</td>
+            <td><input type="checkbox"></td>`;
+          table.appendChild(row);
         });
-    });
-}
-createTable(group1, "table1");
-createTable(group2, "table2");
+        const title = document.createElement("h3");
+        title.textContent = `Подгруппа ${index + 1}`;
+        container.appendChild(title);
+        container.appendChild(table);
+      });
+    }
 
-document.getElementById("date").textContent = new Date().toLocaleDateString("ru-RU");
+    // --- СОХРАНЕНИЕ В WORD ---
+    async function downloadDoc() {
+      const { Document, Packer, Paragraph } = docx;
+      const children = [
+        new Paragraph({ text: "Учёт посещаемости группы Б ВТиПО-25/23 Р", heading: "Heading1" }),
+        new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } })
+      ];
 
-async function downloadDoc() {
-    const { Document, Packer, Paragraph } = docx;
-
-    const children = [new Paragraph({ text: "Учёт посещаемости", heading: "Heading1" })];
-    children.push(new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } }));
-
-    [group1, group2].forEach((group, i) => {
+      [group1, group2].forEach((group, i) => {
         children.push(new Paragraph({ text: `Подгруппа ${i + 1}`, spacing: { after: 200 } }));
         group.forEach((name, index) => {
-            const tr = document.querySelectorAll(`#table${i + 1} tr`)[index];
-            const checked = tr.querySelector("input").checked;
-            const status = checked ? "✅ Присутствует" : "❌ Отсутствует";
-            children.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
+          const tr = document.querySelectorAll(`#tables table:nth-of-type(${i + 1}) tr`)[index + 1];
+          const checked = tr.querySelector("input").checked;
+          const status = checked ? "✅ Присутствует" : "❌ Отсутствует";
+          children.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
         });
         children.push(new Paragraph({ text: "" }));
-    });
+      });
 
-    const doc = new Document({ sections: [{ children }] });
-    const blob = await Packer.toBlob(doc);
-
-    saveAs(blob, `Посещаемость_${new Date().toLocaleDateString("ru-RU")}.docx`);
-}
-</script>
+      const doc = new Document({ sections: [{ children }] });
+      const blob = await Packer.toBlob(doc);
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Посещаемость_${new Date().toLocaleDateString("ru-RU")}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(link.href);
+        link.remove();
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
