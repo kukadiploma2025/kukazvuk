@@ -2,206 +2,143 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Учёт посещаемости — Б ВТиПО-25/23 Р</title>
+  <title>Учёт посещаемости</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.0/docx.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      background: #f3f4f6;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
-    .login, .content {
-      max-width: 800px;
-      margin: 60px auto;
-      background: #fff;
-      padding: 25px;
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-    }
-    button {
-      margin: 10px 0;
-      padding: 10px 15px;
-      background: #0078d7;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005bb5;
+    h2 {
+      text-align: center;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-bottom: 20px;
     }
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
-      text-align: left;
+      text-align: center;
     }
     th {
-      background: #f0f0f0;
+      background: #e3e3e3;
     }
-    h2 {
-      text-align: center;
-      margin-top: 30px;
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+    }
+    button:hover {
+      background: #45a049;
     }
   </style>
 </head>
 <body>
-  <div class="login" id="login">
-    <h2>Вход в систему</h2>
-    <input id="loginInput" placeholder="Логин" />
-    <input id="passwordInput" placeholder="Пароль" type="password" />
-    <button onclick="checkLogin()">Войти</button>
-  </div>
 
-  <div class="content" id="content" style="display:none;">
-    <h2>Учёт посещаемости — Б ВТиПО-25/23 Р</h2>
-    <div id="tables"></div>
-    <button onclick="downloadDoc()">Сохранить в Word</button>
+  <div class="container">
+    <h2>Посещаемость студентов</h2>
+    <h3>1 группа</h3>
+    <table id="group1"></table>
+
+    <h3>2 группа</h3>
+    <table id="group2"></table>
+
+    <button id="downloadBtn">Скачать DOCX</button>
   </div>
 
   <script>
-    // --- ДАННЫЕ ДЛЯ ВХОДА ---
-    const users = [
-      { login: "Kukandrio", password: "7890" },
-      { login: "Asanali", password: "1423" },
-      { login: "ZamSt", password: "2233" }
+    const group1 = [
+      "Айдос Ерланов", "Аружан Сапарова", "Бекзат Нурланов",
+      "Жанель Куатова", "Ернар Тлеулин", "Диас Ахметов",
+      "Асемгуль Муратова", "Руслан Кадыр", "Алина Жумабек",
+      "Самат Кожахмет"
     ];
 
-    // --- СПИСОК СТУДЕНТОВ ---
-    const students = [
-      "Абенов Расулхан Елеубаевич",
-      "Абильгазиев Тагир Балтабаевич",
-      "Аканов Биржан Бейбитович",
-      "Асан Бексултан Альбекулы",
-      "Асанханов Қасымжомарт Ержанұлы",
-      "Барабан Максим Андреевич",
-      "Бодыков Алдияр Ербуланович",
-      "Буряков Матвей Евгениевич",
-      "Бекен Мағжан Еділұлы",
-      "Гадамуров Бекхан Рустамович",
-      "Галимуллин Камиль Раульевич",
-      "Ерден Асанали Ержанұлы",
-      "Жакиянов Амир Маратович",
-      "Жанторин Саян Серикович",
-      "Жумадилов Ильяс Сакенулы",
-      "Зайкен Әділет Нурланұлы",
-      "Игнатенко Артем Алексеевич",
-      "Каиыпов Нурсултан Марсович",
-      "Караосманов Ислам Хусейнович",
-      "Кизаев Алан Максатович",
-      "Ковалев Сергей Владиславович",
-      "Козяков Владислав Дмитриевич",
-      "Кудайбергенов Темирлан Муратович",
-      "Кузьменко Вадим Георгиевич",
-      "Қабдрашит Нұрасыл Мұратұлы",
-      "Қаирбай Әмір Мақсұтұлы",
-      "Қалманбай Алихан Абилдаұлы",
-      "Қуантай Ерлан Ерқанатұлы",
-      "Латифов Ислам Ихтиярович",
-      "Моисеев Вячеслав Евгеньевич",
-      "Муратов Мақсат Маратович",
-      "Мухтаров Алибек Азаматович",
-      "Орунбасар Ерасыл Хамитұлы",
-      "Петрусь Наиль Ескендерович",
-      "Прокофьев Давид Витальевич",
-      "Сагитов Султан Сагатович",
-      "Салкен Диас Мадиұлы",
-      "Сапинов Әділ Нұрмахаматұлы",
-      "Серік Баққали Бейсенбекұлы",
-      "Серикова Анеля Канатовна",
-      "Синельников Артур Николаевич",
-      "Сычёв Сергей Витальевич",
-      "Темирбаев Абылайхан Адильевич",
-      "Тилеуқабыл Алихан Ерболатұлы",
-      "Тлепберген Қуаныш Мұхитұлы",
-      "Хачатрян Артур Гайкович",
-      "Рахметов Мұхаммед Умбетқұлұлы",
-      "Айкеев Тлеухан Тулегенович",
-      "Шаканов Абильмансур Алпамысович",
-      "Шунков Эмир Максатович"
+    const group2 = [
+      "Мадина Бейсен", "Тимур Рахимов", "Арсен Куаныш",
+      "Аяулым Жаксыбаева", "Даурен Сеитов", "Карина Тастан",
+      "Ерасыл Нургалиев", "Алибек Толеу", "Айгерим Ниязова",
+      "Нурислам Абдуллаев"
     ];
 
-    // --- ДЕЛИМ НА 2 ГРУППЫ ---
-    const half = Math.ceil(students.length / 2);
-    const group1 = students.slice(0, half);
-    const group2 = students.slice(half);
+    function createTable(group, elementId) {
+      const table = document.getElementById(elementId);
+      const headerRow = document.createElement("tr");
+      headerRow.innerHTML = "<th>№</th><th>Имя студента</th><th>Присутствие</th>";
+      table.appendChild(headerRow);
 
-    function checkLogin() {
-      const login = document.getElementById("loginInput").value;
-      const pass = document.getElementById("passwordInput").value;
-      const ok = users.some(u => u.login === login && u.password === pass);
-      if (ok) {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("content").style.display = "block";
-        renderTables();
-      } else {
-        alert("Неверный логин или пароль!");
-      }
-    }
-
-    function renderTables() {
-      const container = document.getElementById("tables");
-      container.innerHTML = "";
-      [group1, group2].forEach((group, index) => {
-        const table = document.createElement("table");
-        table.innerHTML = `<tr><th>№</th><th>ФИО студента</th><th>Присутствие</th></tr>`;
-        group.forEach((name, i) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${name}</td>
-            <td><input type="checkbox"></td>`;
-          table.appendChild(row);
-        });
-        const title = document.createElement("h3");
-        title.textContent = `Подгруппа ${index + 1}`;
-        container.appendChild(title);
-        container.appendChild(table);
+      group.forEach((name, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${name}</td>
+          <td><input type="checkbox" class="presence"></td>
+        `;
+        table.appendChild(row);
       });
     }
 
-    // --- СОХРАНЕНИЕ В WORD ---
-    async function downloadDoc() {
-      const { Document, Packer, Paragraph } = docx;
-      const children = [
-        new Paragraph({ text: "Учёт посещаемости группы Б ВТиПО-25/23 Р", heading: "Heading1" }),
-        new Paragraph({ text: `Дата: ${new Date().toLocaleDateString("ru-RU")}`, spacing: { after: 400 } })
-      ];
+    createTable(group1, "group1");
+    createTable(group2, "group2");
 
-      [group1, group2].forEach((group, i) => {
-        children.push(new Paragraph({ text: `Подгруппа ${i + 1}`, spacing: { after: 200 } }));
-        group.forEach((name, index) => {
-          const tr = document.querySelectorAll(`#tables table:nth-of-type(${i + 1}) tr`)[index + 1];
-          const checked = tr.querySelector("input").checked;
-          const status = checked ? "✅ Присутствует" : "❌ Отсутствует";
-          children.push(new Paragraph({ text: `${index + 1}. ${name} — ${status}` }));
+    document.getElementById("downloadBtn").addEventListener("click", async () => {
+      const allTables = document.querySelectorAll("table");
+      let content = [];
+
+      allTables.forEach((table, i) => {
+        const rows = Array.from(table.querySelectorAll("tr")).slice(1);
+        content.push(new docx.Paragraph({
+          text: i === 0 ? "1 группа" : "2 группа",
+          heading: docx.HeadingLevel.HEADING_2
+        }));
+
+        rows.forEach((row, index) => {
+          const name = row.cells[1].textContent;
+          const present = row.cells[2].querySelector("input").checked ? "✅" : "❌";
+          content.push(new docx.Paragraph(`${index + 1}. ${name} — ${present}`));
         });
-        children.push(new Paragraph({ text: "" }));
+
+        content.push(new docx.Paragraph(" "));
       });
 
-      const doc = new Document({ sections: [{ children }] });
-      const blob = await Packer.toBlob(doc);
+      const doc = new docx.Document({
+        sections: [{
+          properties: {},
+          children: [
+            new docx.Paragraph({
+              text: "Отчёт по посещаемости",
+              heading: docx.HeadingLevel.TITLE,
+              alignment: docx.AlignmentType.CENTER
+            }),
+            new docx.Paragraph(" "),
+            ...content
+          ]
+        }]
+      });
+
+      const blob = await docx.Packer.toBlob(doc);
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `Посещаемость_${new Date().toLocaleDateString("ru-RU")}.docx`;
-      document.body.appendChild(link);
+      link.download = "Посещаемость.docx";
       link.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(link.href);
-        link.remove();
-      }, 2000);
-    }
+    });
   </script>
 </body>
 </html>
